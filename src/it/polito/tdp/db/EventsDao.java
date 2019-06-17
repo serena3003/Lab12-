@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -223,6 +225,84 @@ public class EventsDao {
 			e.printStackTrace();
 			return null ;
 		}
+	}
+	
+	public int getDistMinorCrime(int year) {
+		
+		int result = 0;
+		String sql = "SELECT district_id " + 
+					"FROM EVENTS " + 
+					"WHERE YEAR(reported_date)= ? " + 
+					"GROUP BY  district_id " + 
+					"order by COUNT(incident_id) asc " + 
+					"LIMIT 1";
+		
+		try {
+			Connection conn = DBConnect.getConnection() ;
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setInt(1, year);
+
+			ResultSet res = st.executeQuery() ;
+			
+			if(res.next()) {
+				conn.close();
+				return res.getInt("district_id");
+			}
+			
+			conn.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public List<Event> getEventDay(int year) {
+		List<Event> result = new ArrayList<Event>();
+		String sql = "SELECT * " + 
+				"FROM EVENTS " + 
+				"WHERE YEAR(reported_date)=? " + 
+				"ORDER BY (reported_date)asc";
+		
+		try {
+			Connection conn = DBConnect.getConnection() ;
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setInt(1, year);
+
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				try {
+					result.add(new Event(res.getLong("incident_id"),
+							res.getInt("offense_code"),
+							res.getInt("offense_code_extension"), 
+							res.getString("offense_type_id"), 
+							res.getString("offense_category_id"),
+							res.getTimestamp("reported_date").toLocalDateTime(),
+							res.getString("incident_address"),
+							res.getDouble("geo_lon"),
+							res.getDouble("geo_lat"),
+							res.getInt("district_id"),
+							res.getInt("precinct_id"), 
+							res.getString("neighborhood_id"),
+							res.getInt("is_crime"),
+							res.getInt("is_traffic")));
+					 
+				} catch (Throwable t) {
+					t.printStackTrace();
+					System.out.println(res.getInt("day"));
+				}
+				conn.close();
+			}
+			
+			conn.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 	
 	

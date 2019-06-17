@@ -1,8 +1,11 @@
 package it.polito.tdp.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -18,13 +21,19 @@ public class Model {
 	
 	private EventsDao dao;
 	private Graph<District, DefaultWeightedEdge> grafo;
-	private List<District> district;
+	private Map<Integer, District> district;
+	private Simulatore simulatore;
 	
 	
 	public Model() {
 		this.dao = new EventsDao();
 		grafo = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
-		district = dao.getDistrict();
+		district = new HashMap<>();
+		List<District> districtList = dao.getDistrict();
+		for(District d : districtList) {
+			district.put(d.getId(),d);
+		}
+		simulatore = new Simulatore();
 	}
 	
 	public List<Integer> selectYears(){
@@ -48,9 +57,9 @@ public class Model {
 	public void creaGrafo(int year) {
 		
 		//creo il grafo
-		Graphs.addAllVertices(this.grafo, district);
-		for(District d1 : district) {
-			for(District d2 : district) {
+		Graphs.addAllVertices(this.grafo, district.values());
+		for(District d1 : district.values()) {
+			for(District d2 : district.values()) {
 				if(!d1.equals(d2)) {
 					this.grafo.addEdge(d1, d2);
 				}
@@ -58,7 +67,7 @@ public class Model {
 		}
 		
 		//calcolo il centro di ogni distretto
-		for(District d : district) {
+		for(District d : district.values()) {
 			d.setAvgLat(dao.getAvgLat(year, d.getId()));
 			d.setAvgLon(dao.getAvgLon(year, d.getId()));
 			d.newCenter();
@@ -92,7 +101,12 @@ public class Model {
 	}
 
 	public List<District> getDistrict() {
-		return district;
+		return new ArrayList<District>(district.values());
+	}
+
+	public void doSimulazione(LocalDate date, int N) {
+		simulatore.init();
+		simulatore.run();
 	}
 	
 	

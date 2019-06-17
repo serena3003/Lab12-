@@ -5,6 +5,7 @@
 package it.polito.tdp.crimes;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -68,8 +69,21 @@ public class CrimesController {
 
     @FXML
     void doSimula(ActionEvent event) {
-
-    }
+    	txtResult.clear();
+    	int year = boxAnno.getValue();
+    	int month = boxMese.getValue();
+    	int day = boxGiorno.getValue();
+    	
+    	//LocalDate date = LocalDate.of(year, month, day);
+    	
+    	int N = Integer.parseInt(txtN.getText());
+    	if(N<1 || N >10) {
+    		txtN.clear();
+    		txtResult.appendText("Valore di N non accettabile, inserirlo nuovamente.");
+    	} else {
+    		model.doSimulazione(year, month, day, N);
+    	}
+    	}
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
