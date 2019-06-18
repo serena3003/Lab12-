@@ -29,10 +29,10 @@ public class Model {
 		this.dao = new EventsDao();
 		grafo = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 		district = new HashMap<>();
-		List<District> districtList = dao.getDistrict();
+		/*List<District> districtList = dao.getDistrict();
 		for(District d : districtList) {
 			district.put(d.getId(),d);
-		}
+		}*/
 		simulatore = new Simulatore();
 	}
 	
@@ -55,6 +55,11 @@ public class Model {
 	}
 
 	public void creaGrafo(int year) {
+		
+		List<District> districtList = dao.getDistrict();
+		for(District d : districtList) {
+			district.put(d.getId(),d);
+		}
 		
 		//creo il grafo
 		Graphs.addAllVertices(this.grafo, district.values());
@@ -100,13 +105,19 @@ public class Model {
 		return grafo;
 	}
 
-	public List<District> getDistrict() {
+	public List<District> getDistrictList() {
 		return new ArrayList<District>(district.values());
 	}
+	
+	public Map<Integer, District> getDistrictMap(){
+		return this.district;
+	}
 
-	public void doSimulazione(LocalDate date, int N) {
-		simulatore.init();
+	public int doSimulazione(int year,int month,int day, int N) {
+		
+		simulatore.init(this.district, year, month, day, N);
 		simulatore.run();
+		return simulatore.getEvMalgestiti();
 	}
 	
 	

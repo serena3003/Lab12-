@@ -56,7 +56,7 @@ public class CrimesController {
     	//creo il grafo
     	model.creaGrafo(year);
     	//modello output
-    	List<District> district = model.getDistrict();
+    	List<District> district = model.getDistrictList();
     	for(District d : district) {
     		List<Neighbor> neighbor = model.getNeighbor(d);
     		txtResult.appendText("\nI VICINI DI "+ d.getId()+" SONO: \n");
@@ -81,7 +81,8 @@ public class CrimesController {
     		txtN.clear();
     		txtResult.appendText("Valore di N non accettabile, inserirlo nuovamente.");
     	} else {
-    		model.doSimulazione(year, month, day, N);
+    		int result = model.doSimulazione(year, month, day, N);
+    		txtResult.appendText("\nGli eventi mal gestiti del giorno "+ day +" - " + month + " - " + year + " con " + N + " agenti sono: " + result +"\n");
     	}
     	}
 
@@ -102,5 +103,9 @@ public class CrimesController {
     	boxAnno.getItems().addAll(model.selectYears());
     	boxMese.getItems().addAll(model.selectMonths());
     	boxGiorno.getItems().addAll(model.selectDays());
+    	
+    	/*for(int i = 0; i<12;i++) {
+    		boxMese.getItems().add(i+1);
+    	}*/
     }
 }

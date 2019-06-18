@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import it.polito.tdp.model.District;
 import it.polito.tdp.model.Event;
@@ -258,17 +259,20 @@ public class EventsDao {
 		return result;
 	}
 
-	public List<Event> getEventDay(int year) {
+	public List<Event> getEventDay(int year, int month, int day) {
 		List<Event> result = new ArrayList<Event>();
 		String sql = "SELECT * " + 
 				"FROM EVENTS " + 
-				"WHERE YEAR(reported_date)=? " + 
+				"WHERE YEAR(reported_date)=? AND month(reported_date)=? AND day(reported_date)=? " + 
 				"ORDER BY (reported_date)asc";
 		
 		try {
 			Connection conn = DBConnect.getConnection() ;
 			PreparedStatement st = conn.prepareStatement(sql) ;
 			st.setInt(1, year);
+			st.setInt(2, month);
+			st.setInt(3, day);
+
 
 			ResultSet res = st.executeQuery() ;
 			
